@@ -75,6 +75,32 @@ async function startSheetsService() {
 async function startRestService(sheet) {
 	const app = fastify()
 
+	app.addHook("onRequest", (request, reply, done) => {
+		let authorization = request.headers.authorization
+
+		if (authorization) {
+			let [ type, token ] = authorization.split(" ")
+
+			if (type === "Bearer" && key) {
+				if (config.keys.indexOf(token) !== -1) {
+					done()
+				} else {
+					reply.status(401).send({
+						error: "Invalid token",
+					})
+				}
+			} else {
+				reply.status(400).send({
+					error: "Invalid Authorization header",
+				})
+			}
+		} else {
+			reply.status(400).send({
+				error: "Missing Authorization header",
+			})
+		}
+	})
+
 	app.route({
 		method: "GET",
 		path: "/:format",
