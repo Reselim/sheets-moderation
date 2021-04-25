@@ -60,6 +60,12 @@ async function startSheetsService() {
 			}
 		})
 
+		rows = rows.filter((row) => {
+			return row.userId
+				&& config.types.includes(row.type)
+				&& config.reasons.includes(row.reason)
+		})
+
 		currentPayloadJson = encodeJsonPayload(rows)
 		currentPayloadBinary = encodeBinaryPayload(rows)
 	}
